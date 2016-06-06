@@ -91,17 +91,13 @@
 					attributes[nodeAttribute.name] = nodeAttribute.value;
 				}
 
-				if ( nodeContainer.hasTextNodeOnly(node) ) {
-					text = node.childNodes[0].textContent.trim();
-				}
-
 				break;
 
 			case nodeContainer.REFERENCE.NODE_TYPE[3]:
 
-				text = node.textContent.trim();
+				text = node.textContent;
 
-				if (!text || nodeContainer.hasTextNodeOnly(node.parentNode)) {
+				if (!text.trim()) {
 					return null;
 				}
 
@@ -125,14 +121,13 @@
 
 	};
 
-	NodeParser.prototype.hasTextNodeOnly = function (node) {
-
-		var nodeContainer = this;
-
-		return node.childNodes.length === 1 && nodeContainer.REFERENCE.NODE_TYPE[node.childNodes[0].nodeType] === nodeContainer.REFERENCE.NODE_TYPE[3];
-
-	};
-
 	win.NodeParser = NodeParser;
+
+	win.nodeParserUtil = {
+		KEYS: NodeParser.prototype.KEYS,
+		REFERENCE: NodeParser.prototype.REFERENCE,
+		parseNode: NodeParser.prototype.parseNode,
+		nodeToJSON: NodeParser.prototype.nodeToJSON
+	};
 
 }(window));
