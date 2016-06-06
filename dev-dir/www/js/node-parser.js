@@ -1,17 +1,21 @@
 /*jslint white: true, nomen: true */
-(function (win) {
+(function () {
 
 	'use strict';
-	/*global window */
 
 	function NodeParser(node) {
 
 		var nodeContainer = this;
 
-		nodeContainer.attr = {};
-
-		nodeContainer.set(nodeContainer.KEYS.NODE, node);
-		nodeContainer.set(nodeContainer.KEYS.PARSED_NODE, nodeContainer.parseNode(node));
+		// detect if new NodeParser(node)
+		if (nodeContainer) {
+			nodeContainer.attr = {};
+			nodeContainer.set(nodeContainer.KEYS.NODE, node);
+			nodeContainer.set(nodeContainer.KEYS.PARSED_NODE, nodeContainer.parseNode(node));
+		} else {
+			// detect if NodeParser(node)
+			return NodeParser.prototype.parseNode(node);
+		}
 
 	}
 
@@ -121,15 +125,14 @@
 
 	};
 
-	win.NodeParser = NodeParser;
+	var _globals = (function(){ return this || (0,eval)('this'); }());
 
-	var nodeParserPrototype = NodeParser.prototype;
+	if (typeof module !== "undefined" && module.exports) {
+		module.exports = NodeParser;
+	} else if (typeof define === "function" && define.amd) {
+		define(function(){return NodeParser;});
+	} else {
+		_globals.NodeParser = NodeParser;
+	}
 
-	win.nodeParserUtil = {
-		KEYS: nodeParserPrototype.KEYS,
-		REFERENCE: nodeParserPrototype.REFERENCE,
-		parseNode: nodeParserPrototype.parseNode,
-		nodeToJSON: nodeParserPrototype.nodeToJSON
-	};
-
-}(window));
+}());

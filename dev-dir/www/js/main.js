@@ -9,7 +9,8 @@
 		var node = win.document.querySelector('.me');
 
 		console.log(new NodeParser(node));
-		console.log(nodeParserUtil.parseNode(node));
+		console.log(NodeParser.prototype.parseNode(node));
+		console.log(NodeParser(node));
 
 	}, false);
 
