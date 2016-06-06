@@ -123,11 +123,13 @@
 
 	win.NodeParser = NodeParser;
 
+	var nodeParserPrototype = NodeParser.prototype;
+
 	win.nodeParserUtil = {
-		KEYS: NodeParser.prototype.KEYS,
-		REFERENCE: NodeParser.prototype.REFERENCE,
-		parseNode: NodeParser.prototype.parseNode,
-		nodeToJSON: NodeParser.prototype.nodeToJSON
+		KEYS: nodeParserPrototype.KEYS,
+		REFERENCE: nodeParserPrototype.REFERENCE,
+		parseNode: nodeParserPrototype.parseNode,
+		nodeToJSON: nodeParserPrototype.nodeToJSON
 	};
 
 }(window));

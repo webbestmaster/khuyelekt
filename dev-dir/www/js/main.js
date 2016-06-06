@@ -8,11 +8,8 @@
 
 		var node = win.document.querySelector('.me');
 
-
-		new NodeParser(node);
-		nodeParserUtil.parseNode(node);
-		debugger
-
+		console.log(new NodeParser(node));
+		console.log(nodeParserUtil.parseNode(node));
 
 	}, false);
 
