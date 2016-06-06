@@ -1,6 +1,20 @@
-<h1>Love card for my wife.</h1>
+Meet Khuyelekt!
 
-<h2>Abbreviations and acronyms:</h2>
-DO - Display Object - main object for UI elements
+The wrapper above usual tag select.
+
+Dependencies:
+
+1) doT.js
+    https://github.com/olado/doT
+    https://raw.githubusercontent.com/olado/doT/master/doT.js
+
+
+
+
+
+
+
+
+
 
 
