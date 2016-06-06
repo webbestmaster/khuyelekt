@@ -1,0 +1,23 @@
+{
+  "name": "khuyelekt",
+  "version": "0.0.1",
+  "description": "khuyelekt - custom select",
+  "license": "MIT",
+  "repository": {
+    "type": "git"
+  },
+  "scripts": {
+    "server": "lite-server",
+    "server-dist": "lite-server -c bs-dist-config.json"
+
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-minify-css": "^1.2.1",
+    "gulp-minify-html": "^1.0.4",
+    "gulp-requirejs": "^0.1.3",
+    "gulp-rimraf": "^0.2.0",
+    "gulp-uglify": "^1.2.0",
+    "lite-server": "^2.2.0"
+  }
+}
