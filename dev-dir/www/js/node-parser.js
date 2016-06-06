@@ -65,7 +65,7 @@
 			childNode = childNodes[i];
 			nodeInJson = nodeContainer.parseNode(childNode);
 			if (nodeInJson) {
-				root.children.push(nodeInJson);
+				root.children[root.children.length] = nodeInJson;
 			}
 		}
 
