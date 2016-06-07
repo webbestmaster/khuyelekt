@@ -12,6 +12,27 @@
 		console.log(NodeParser.prototype.parseNode(node));
 		console.log(NodeParser(node));
 
+		var selectFree = new SelectFree(
+			win.document.querySelector('select'),
+			function elementTemplate(select) {
+
+				if (select.value === '1') {
+					return '<div>1</div>';
+				}
+
+				var ee = Math.random();
+
+				return '<span>444444</span> asdasdasdsfsaf <span>55555</span><div>333</div><h1>ww</h1><span>' + ee  + '</span>';
+
+			},
+			function listTemplate(select) {
+
+			},
+			{
+
+			}
+		);
+
 	}, false);
 
 }(window));
