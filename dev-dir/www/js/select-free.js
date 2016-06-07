@@ -53,8 +53,7 @@
 
 		for (i = 0, len = nodeElements.length; i < len; i += 1) {
 			nodeElement = nodeElements[i];
-			console.log(nodeElement.removeEventListener('click', selectFree.onClickElement, false));
-			;
+			nodeElement.removeEventListener('click', selectFree.onClickElement, false);
 		}
 
 	};
@@ -140,7 +139,7 @@
 			select = selectFree.get(selectFree.KEYS.NODE.SELECT),
 			tempNode = doc.createElement('div');
 
-		tempNode.innerHTML = template(select);
+		tempNode.innerHTML = template.call(this, select);
 
 		return Array.prototype.slice.call(tempNode.children);
 
