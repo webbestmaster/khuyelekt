@@ -6,7 +6,7 @@
 
 	function SelectFree(select, elementTemplate, listTemplate, options) {
 
-		select.style.display = 'none';
+		// select.style.display = 'none';
 
 		var selectFree = this;
 
@@ -17,9 +17,51 @@
 		selectFree.set(selectFree.KEYS.TEMPLATE.LIST, listTemplate);
 		selectFree.set(selectFree.KEYS.OPTIONS, options || {});
 
+		selectFree.onClickElement = selectFree.onClickElement.bind(selectFree);
+
 		selectFree.initialize(select, options);
 
 	}
+
+	SelectFree.prototype.onClickElement = function () {
+
+		
+
+
+	};
+
+	SelectFree.prototype.bindElementEventListeners = function () {
+
+		var selectFree = this,
+			nodeElements = selectFree.get(selectFree.KEYS.NODE.ELEMENTS),
+			nodeElement,
+			i, len;
+
+		for (i = 0, len = nodeElements.length; i < len; i += 1) {
+			nodeElement = nodeElements[i];
+			nodeElement.addEventListener('click', selectFree.onClickElement, false);
+		}
+
+	};
+
+	SelectFree.prototype.unbindElementEventListeners = function () {
+
+		var selectFree = this,
+			nodeElements = selectFree.get(selectFree.KEYS.NODE.ELEMENTS),
+			nodeElement,
+			i, len;
+
+		for (i = 0, len = nodeElements.length; i < len; i += 1) {
+			nodeElement = nodeElements[i];
+			console.log(nodeElement.removeEventListener('click', selectFree.onClickElement, false));
+			;
+		}
+
+	};
+
+
+
+
 
 	SelectFree.prototype.set = function (key, value) {
 		this.attr[key] = value;
@@ -69,6 +111,7 @@
 			i, len;
 
 		if (oldNodeElements) {
+			selectFree.unbindElementEventListeners();
 			for (i = 0, len = oldNodeElements.length; i < len; i += 1) {
 				oldNodeElement = oldNodeElements[i];
 				oldNodeElement.parentNode.removeChild(oldNodeElement);
@@ -81,6 +124,8 @@
 			select.parentNode.insertBefore(newNodeElements[i], select);
 		}
 
+		selectFree.bindElementEventListeners();
+
 	};
 
 	SelectFree.prototype.createNodes = function (template) {
@@ -88,6 +133,8 @@
 		// TODO:
 		// optimize  doc.createElement('div'), i.e. create temp div and
 		// do not create a new div each time
+		// TODO:
+		// The same for Array.prototype.slice.call
 
 		var selectFree = this,
 			select = selectFree.get(selectFree.KEYS.NODE.SELECT),
