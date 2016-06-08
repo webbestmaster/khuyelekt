@@ -4,7 +4,7 @@
 	"use strict";
 	/*global window */
 
-	function SelectFree(select, elementData, listData, options) {
+	function SelectFree($select, elementData, listData, options) {
 
 		// select.style.display = 'none';
 
@@ -12,21 +12,22 @@
 
 		selectFree.attr = {};
 
-		selectFree.setOpenState(selectFree.KEYS.STATES.CLOSE);
-
 		MicroEvent.mixin(this);
 
-		selectFree.set(selectFree.KEYS.NODE.$_SELECT, select);
+		selectFree.set(selectFree.KEYS.NODE.$_BODY, $(doc.body));
+		selectFree.set(selectFree.KEYS.NODE.$_SELECT, $select);
 		selectFree.set(selectFree.KEYS.ELEMENT.TEMPLATE, elementData.template);
 		selectFree.set(selectFree.KEYS.ELEMENT.EVENTS, elementData.events || {});
 		selectFree.set(selectFree.KEYS.LIST.TEMPLATE, listData.template);
 		selectFree.set(selectFree.KEYS.LIST.EVENTS, listData.events || {});
+		// selectFree.set(selectFree.KEYS.OPTIONS, options || {});
+		selectFree.setOpenState(selectFree.KEYS.STATES.CLOSE);
 
-		selectFree.set(selectFree.KEYS.OPTIONS, options || {});
+		selectFree.setValue($select.val());
 
 		selectFree.onClickElement = selectFree.onClickElement.bind(selectFree);
 
-		selectFree.initialize(select, options);
+		selectFree.initialize();
 
 	}
 
@@ -87,41 +88,125 @@
 
 	SelectFree.prototype.open = function () {
 
-		var selectFree = this;
+		var selectFree = this,
+			template = selectFree.get(selectFree.KEYS.LIST.TEMPLATE),
+			$list = selectFree.createNodes(template),
+			currentOpenState = selectFree.getOpenState(),
+			promise;
 
-		selectFree.setOpenState(selectFree.KEYS.STATES.OPENING);
+		if (
+			currentOpenState === selectFree.KEYS.STATES.OPEN ||
+			currentOpenState === selectFree.KEYS.STATES.OPENING
+		) {
+			return selectFree.get(selectFree.KEYS.PROMISES.OPENING);
+		}
 
-		return new Promise(function (resolve, reject) {
+		promise = new Promise(function (resolve, reject) {
 
+			// show list animation here
 			setTimeout(resolve, 1000);
 
 		}).then(function () {
 
+			selectFree.bindListEventListeners();
 			selectFree.setOpenState(selectFree.KEYS.STATES.OPEN);
 
 			selectFree.trigger(selectFree.KEYS.STATES.OPEN);
 
 		});
 
+		selectFree.setOpenState(selectFree.KEYS.STATES.OPENING);
+
+		selectFree.get(selectFree.KEYS.NODE.$_BODY).append($list);
+		selectFree.set(selectFree.KEYS.NODE.$_LIST, $list);
+
+		selectFree.set(selectFree.KEYS.PROMISES.OPENING, promise);
+
+		return promise;
+
 	};
 
 	SelectFree.prototype.close = function () {
 
-		var selectFree = this;
+		var selectFree = this,
+			$list = selectFree.get(selectFree.KEYS.NODE.$_LIST),
+			currentOpenState = selectFree.getOpenState(),
+			promise;
 
-		selectFree.setOpenState(selectFree.KEYS.STATES.CLOSING);
+		if (
+			currentOpenState === selectFree.KEYS.STATES.CLOSE ||
+			currentOpenState === selectFree.KEYS.STATES.CLOSING
+		) {
+			return selectFree.get(selectFree.KEYS.PROMISES.CLOSING);
+		}
 
-		return new Promise(function (resolve, reject) {
+		promise = new Promise(function (resolve, reject) {
 
 			setTimeout(resolve, 1000);
 
 		}).then(function () {
+
+			$list.remove();
 
 			selectFree.setOpenState(selectFree.KEYS.STATES.CLOSE);
 
 			selectFree.trigger(selectFree.KEYS.STATES.CLOSE);
 
 		});
+
+		selectFree.setOpenState(selectFree.KEYS.STATES.CLOSING);
+
+		$list.off();
+
+		selectFree.set(selectFree.KEYS.PROMISES.CLOSING, promise);
+
+		return promise;
+
+	};
+
+	SelectFree.prototype.getValue = function () {
+
+		var selectFree = this;
+
+		return selectFree.get(selectFree.KEYS.VALUE);
+
+	};
+
+	SelectFree.prototype.setValue = function (value) {
+
+		var selectFree = this,
+			currentValue = selectFree.getValue(),
+			$select;
+
+		selectFree.set(selectFree.KEYS.VALUE, value);
+
+		selectFree.trigger(selectFree.KEYS.EVENTS.SELECT, value);
+
+		if (currentValue !== value) {
+			$select = selectFree.get(selectFree.KEYS.NODE.$_SELECT);
+			$select.val(value);
+			selectFree.trigger(selectFree.KEYS.EVENTS.CHANGE, value);
+		}
+
+	};
+
+	SelectFree.prototype.selectAndClose = function (e) {
+
+		var selectFree = this;
+
+		selectFree.select(e);
+
+		selectFree.close();
+
+	};
+
+	SelectFree.prototype.select = function (e) {
+
+		var selectFree = this,
+			node = e.currentTarget,
+			value = node.dataset.value;
+
+		selectFree.setValue(value);
 
 	};
 
@@ -131,20 +216,39 @@
 			$nodeElements = selectFree.get(selectFree.KEYS.NODE.$_ELEMENTS),
 			events = selectFree.get(selectFree.KEYS.ELEMENT.EVENTS);
 
-		$nodeElements.on('click', selectFree.onClickElement);
-
-		selectFree.bindEventListenersToElement($nodeElements, events);
+		selectFree.bindEventListenersToNodes($nodeElements, events);
 
 	};
 
-	SelectFree.prototype.bindEventListenersToElement = function ($nodes, evetns) {
+	SelectFree.prototype.bindListEventListeners = function () {
 
 		var selectFree = this,
-			key;
+			$nodeElements = selectFree.get(selectFree.KEYS.NODE.$_LIST),
+			events = selectFree.get(selectFree.KEYS.LIST.EVENTS);
+
+		selectFree.bindEventListenersToNodes($nodeElements, events);
+
+	};
+
+	SelectFree.prototype.bindEventListenersToNodes = function ($nodes, evetns) {
+
+		var selectFree = this,
+			key,
+			eventData,
+			eventName,
+			selector,
+			reSelectorEvent = selectFree.KEYS.RE.SELECTOR_EVENT;
 
 		for (key in evetns) {
 			if (evetns.hasOwnProperty(key)) {
-				$nodes.on(key, evetns[key].bind(selectFree));
+				eventData = key.match(reSelectorEvent);
+				selector = eventData[1].trim();
+				eventName = eventData[2].trim();
+				if (eventName) {
+					$nodes.find(selector).on(eventName, evetns[key].bind(selectFree));
+				} else {
+					$nodes.on(selector, evetns[key].bind(selectFree));
+				}
 			}
 		}
 
@@ -160,7 +264,13 @@
 
 	SelectFree.prototype.KEYS = {
 
+		RE: {
+			SELECTOR_EVENT: /^(\S+)\s*([\s\S]*)$/
+		},
+
 		OPEN_STATE: 'select-free:open-state',
+
+		VALUE: 'select-free:value',
 
 		STATES: {
 			OPENING: 'select-free:events:opening',
@@ -168,6 +278,17 @@
 			CLOSING: 'select-free:events:closing',
 			CLOSE: 'select-free:events:close'
 		},
+
+		PROMISES: {
+			OPENING: 'select-free:promises:opening',
+			CLOSING: 'select-free:promises:closing'
+		},
+
+		EVENTS: {
+			SELECT: 'select-free:select',
+			CHANGE: 'select-free:change'
+		},
+
 		ELEMENT: {
 			TEMPLATE: 'select-free:element:template',
 			EVENTS: 'select-free:element:events'
@@ -183,14 +304,15 @@
 		NODE: {
 			$_SELECT: 'select-free:node:select',
 			$_ELEMENTS: 'select-free:node:element',
-			$_LIST: 'select-free:node:list'
-		},
-		OPTIONS: 'select-free:options'
-		/*,
-		HELPERS: {
-			TEMP_NODE: 'select-free:helpers:temp-node'
+			$_LIST: 'select-free:node:list',
+			$_BODY: 'select-free:node:body'
 		}
-		*/
+		// OPTIONS: 'select-free:options'
+		/*,
+		 HELPERS: {
+		 TEMP_NODE: 'select-free:helpers:temp-node'
+		 }
+		 */
 
 	};
 
@@ -227,21 +349,21 @@
 		var selectFree = this,
 			select = selectFree.get(selectFree.KEYS.NODE.$_SELECT);
 
-		return  $(template.call(this, select));
+		return $(template.call(this, select));
 
 	};
 
 
-
-
-
-
-	var _globals = (function(){ return this || (0,eval)('this'); }());
+	var _globals = (function () {
+		return this || (0, eval)('this');
+	}());
 
 	if (typeof module !== "undefined" && module.exports) {
 		module.exports = SelectFree;
 	} else if (typeof define === "function" && define.amd) {
-		define(function(){return SelectFree;});
+		define(function () {
+			return SelectFree;
+		});
 	} else {
 		_globals.SelectFree = SelectFree;
 	}

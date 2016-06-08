@@ -17,11 +17,11 @@
 			$('select'),
 			{
 				events: {
-					'click': function (e) {
+					'span click': function (e) {
 						console.log('from user\'s event');
 						console.log(e.currentTarget, this);
-					}
-					// 'selector to close': 'spec word to close - SelectFree.prototype.KEYS:CLOSE_FUNCTION'
+					},
+					'click': SelectFree.prototype.onClickElement
 				},
 				template: function elementTemplate($select) {
 
@@ -31,14 +31,17 @@
 
 					var ee = Math.random();
 
-					return '<span>444444</span> asdasdasdsfsaf <span>55555</span><div>333</div><h1>ww</h1><span>' + ee + '</span>';
+					return '<span>444444</span> asdasdasdsfsaf <span>55555<span>ww</span></span><div>333</div><h1>ww</h1><span>' + ee + '</span>';
 
 				}
 			},
 			{
 				events: {
-					'selector here': 'function here',
-					'selector to close': 'spec word to close - SelectFree.prototype.KEYS:CLOSE_FUNCTION'
+					'span click': function () {
+						console.log('click on list');
+					},
+					'div click': SelectFree.prototype.close,
+					'.option click': SelectFree.prototype.selectAndClose
 				},
 				template: function listTemplate($select) {
 
@@ -48,14 +51,13 @@
 
 					var ee = Math.random();
 
-					return '<span>444444</span> asdasdasdsfsaf <span>55555</span><div>333</div><h1>ww</h1><span>' + ee + '</span>';
+					// WARNING data-value - this value will be use as major value
+
+					return '<h1><div>close</div><div data-value="3" class="option">option</div>  <span>assa</span>pizdatyi list</h1><span>' + ee + '</span>';
 
 				}
 
-			},
-
-
-			{}
+			}
 		);
 
 		selectFree.bind(selectFree.KEYS.STATES.OPEN, function () {
@@ -64,6 +66,14 @@
 
 		selectFree.bind(selectFree.KEYS.STATES.CLOSE, function () {
 			console.log(selectFree.KEYS.STATES.CLOSE);
+		});
+
+		selectFree.bind(selectFree.KEYS.EVENTS.SELECT, function () {
+			console.log(selectFree.KEYS.EVENTS.SELECT);
+		});
+
+		selectFree.bind(selectFree.KEYS.EVENTS.CHANGE, function () {
+			console.log(selectFree.KEYS.EVENTS.CHANGE);
 		});
 
 
