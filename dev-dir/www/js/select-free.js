@@ -12,6 +12,10 @@
 
 		selectFree.attr = {};
 
+		selectFree.setOpenState(selectFree.KEYS.STATES.CLOSE);
+
+		MicroEvent.mixin(this);
+
 		selectFree.set(selectFree.KEYS.NODE.$_SELECT, select);
 		selectFree.set(selectFree.KEYS.ELEMENT.TEMPLATE, elementData.template);
 		selectFree.set(selectFree.KEYS.ELEMENT.EVENTS, elementData.events || {});
@@ -26,10 +30,98 @@
 
 	}
 
+	SelectFree.prototype.getOpenState = function () {
+
+		var selectFree = this;
+
+		return selectFree.get(selectFree.KEYS.OPEN_STATE);
+
+	};
+
+	SelectFree.prototype.setOpenState = function (value) {
+
+		var selectFree = this;
+
+		return selectFree.set(selectFree.KEYS.OPEN_STATE, value);
+
+	};
+
 	SelectFree.prototype.onClickElement = function () {
 
-		console.log(this);
-		console.log('open or close select here .....');
+		// detect current state
+		// do needed action
+
+		var selectFree = this,
+			openState = selectFree.getOpenState();
+
+		switch (openState) {
+
+			case selectFree.KEYS.STATES.OPENING:
+
+				break;
+
+			case selectFree.KEYS.STATES.OPEN:
+
+				selectFree.close();
+
+				break;
+
+			case selectFree.KEYS.STATES.CLOSING:
+
+				break;
+
+			case selectFree.KEYS.STATES.CLOSE:
+
+				selectFree.open();
+
+				break;
+
+			default:
+
+				console.log('Hm, I do NOT know this state -', openState);
+
+		}
+
+
+	};
+
+	SelectFree.prototype.open = function () {
+
+		var selectFree = this;
+
+		selectFree.setOpenState(selectFree.KEYS.STATES.OPENING);
+
+		return new Promise(function (resolve, reject) {
+
+			setTimeout(resolve, 1000);
+
+		}).then(function () {
+
+			selectFree.setOpenState(selectFree.KEYS.STATES.OPEN);
+
+			selectFree.trigger(selectFree.KEYS.STATES.OPEN);
+
+		});
+
+	};
+
+	SelectFree.prototype.close = function () {
+
+		var selectFree = this;
+
+		selectFree.setOpenState(selectFree.KEYS.STATES.CLOSING);
+
+		return new Promise(function (resolve, reject) {
+
+			setTimeout(resolve, 1000);
+
+		}).then(function () {
+
+			selectFree.setOpenState(selectFree.KEYS.STATES.CLOSE);
+
+			selectFree.trigger(selectFree.KEYS.STATES.CLOSE);
+
+		});
 
 	};
 
@@ -68,6 +160,14 @@
 
 	SelectFree.prototype.KEYS = {
 
+		OPEN_STATE: 'select-free:open-state',
+
+		STATES: {
+			OPENING: 'select-free:events:opening',
+			OPEN: 'select-free:events:open',
+			CLOSING: 'select-free:events:closing',
+			CLOSE: 'select-free:events:close'
+		},
 		ELEMENT: {
 			TEMPLATE: 'select-free:element:template',
 			EVENTS: 'select-free:element:events'
@@ -91,8 +191,6 @@
 			TEMP_NODE: 'select-free:helpers:temp-node'
 		}
 		*/
-
-
 
 	};
 
