@@ -101,6 +101,8 @@
 
 				text = node.textContent;
 
+				// --- WARNING ---
+				// --- here is return ---
 				if (!text.trim()) {
 					return null;
 				}

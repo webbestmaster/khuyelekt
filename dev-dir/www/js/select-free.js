@@ -4,7 +4,7 @@
 	"use strict";
 	/*global window */
 
-	function SelectFree(select, elementTemplate, listTemplate, options) {
+	function SelectFree(select, elementData, listData, options) {
 
 		// select.style.display = 'none';
 
@@ -12,9 +12,12 @@
 
 		selectFree.attr = {};
 
-		selectFree.set(selectFree.KEYS.NODE.SELECT, select);
-		selectFree.set(selectFree.KEYS.TEMPLATE.ELEMENT, elementTemplate);
-		selectFree.set(selectFree.KEYS.TEMPLATE.LIST, listTemplate);
+		selectFree.set(selectFree.KEYS.NODE.$_SELECT, select);
+		selectFree.set(selectFree.KEYS.ELEMENT.TEMPLATE, elementData.template);
+		selectFree.set(selectFree.KEYS.ELEMENT.EVENTS, elementData.events || {});
+		selectFree.set(selectFree.KEYS.LIST.TEMPLATE, listData.template);
+		selectFree.set(selectFree.KEYS.LIST.EVENTS, listData.events || {});
+
 		selectFree.set(selectFree.KEYS.OPTIONS, options || {});
 
 		selectFree.onClickElement = selectFree.onClickElement.bind(selectFree);
@@ -25,42 +28,35 @@
 
 	SelectFree.prototype.onClickElement = function () {
 
-		
-
+		console.log(this);
+		console.log('open or close select here .....');
 
 	};
 
 	SelectFree.prototype.bindElementEventListeners = function () {
 
 		var selectFree = this,
-			nodeElements = selectFree.get(selectFree.KEYS.NODE.ELEMENTS),
-			nodeElement,
-			i, len;
+			$nodeElements = selectFree.get(selectFree.KEYS.NODE.$_ELEMENTS),
+			events = selectFree.get(selectFree.KEYS.ELEMENT.EVENTS);
 
-		for (i = 0, len = nodeElements.length; i < len; i += 1) {
-			nodeElement = nodeElements[i];
-			nodeElement.addEventListener('click', selectFree.onClickElement, false);
-		}
+		$nodeElements.on('click', selectFree.onClickElement);
+
+		selectFree.bindEventListenersToElement($nodeElements, events);
 
 	};
 
-	SelectFree.prototype.unbindElementEventListeners = function () {
+	SelectFree.prototype.bindEventListenersToElement = function ($nodes, evetns) {
 
 		var selectFree = this,
-			nodeElements = selectFree.get(selectFree.KEYS.NODE.ELEMENTS),
-			nodeElement,
-			i, len;
+			key;
 
-		for (i = 0, len = nodeElements.length; i < len; i += 1) {
-			nodeElement = nodeElements[i];
-			nodeElement.removeEventListener('click', selectFree.onClickElement, false);
+		for (key in evetns) {
+			if (evetns.hasOwnProperty(key)) {
+				$nodes.on(key, evetns[key].bind(selectFree));
+			}
 		}
 
 	};
-
-
-
-
 
 	SelectFree.prototype.set = function (key, value) {
 		this.attr[key] = value;
@@ -71,14 +67,23 @@
 	};
 
 	SelectFree.prototype.KEYS = {
-		TEMPLATE: {
-			ELEMENT: 'select-free:template:element',
-			LIST: 'select-free:template:list'
+
+		ELEMENT: {
+			TEMPLATE: 'select-free:element:template',
+			EVENTS: 'select-free:element:events'
 		},
+		LIST: {
+			TEMPLATE: 'select-free:list:template',
+			EVENTS: 'select-free:list:events'
+		},
+		// TEMPLATE: {
+		// 	ELEMENT: 'select-free:template:element',
+		// 	LIST: 'select-free:template:list'
+		// },
 		NODE: {
-			SELECT: 'select-free:node:select',
-			ELEMENTS: 'select-free:node:element',
-			LIST: 'select-free:node:list'
+			$_SELECT: 'select-free:node:select',
+			$_ELEMENTS: 'select-free:node:element',
+			$_LIST: 'select-free:node:list'
 		},
 		OPTIONS: 'select-free:options'
 		/*,
@@ -102,26 +107,18 @@
 	SelectFree.prototype.updateElementNode = function () {
 
 		var selectFree = this,
-			oldNodeElements = selectFree.get(selectFree.KEYS.NODE.ELEMENTS),
-			oldNodeElement,
-			select = selectFree.get(selectFree.KEYS.NODE.SELECT),
-			template = selectFree.get(selectFree.KEYS.TEMPLATE.ELEMENT),
-			newNodeElements = selectFree.createNodes(template),
-			i, len;
+			$oldNodeElements = selectFree.get(selectFree.KEYS.NODE.$_ELEMENTS),
+			$select = selectFree.get(selectFree.KEYS.NODE.$_SELECT),
+			template = selectFree.get(selectFree.KEYS.ELEMENT.TEMPLATE),
+			$newNodeElements = selectFree.createNodes(template);
 
-		if (oldNodeElements) {
-			selectFree.unbindElementEventListeners();
-			for (i = 0, len = oldNodeElements.length; i < len; i += 1) {
-				oldNodeElement = oldNodeElements[i];
-				oldNodeElement.parentNode.removeChild(oldNodeElement);
-			}
+		if ($oldNodeElements) {
+			$oldNodeElements.off().remove();
 		}
 
-		selectFree.set(selectFree.KEYS.NODE.ELEMENTS, newNodeElements);
+		selectFree.set(selectFree.KEYS.NODE.$_ELEMENTS, $newNodeElements);
 
-		for (i = 0, len = newNodeElements.length; i < len; i += 1) {
-			select.parentNode.insertBefore(newNodeElements[i], select);
-		}
+		$newNodeElements.insertAfter($select);
 
 		selectFree.bindElementEventListeners();
 
@@ -129,19 +126,10 @@
 
 	SelectFree.prototype.createNodes = function (template) {
 
-		// TODO:
-		// optimize  doc.createElement('div'), i.e. create temp div and
-		// do not create a new div each time
-		// TODO:
-		// The same for Array.prototype.slice.call
-
 		var selectFree = this,
-			select = selectFree.get(selectFree.KEYS.NODE.SELECT),
-			tempNode = doc.createElement('div');
+			select = selectFree.get(selectFree.KEYS.NODE.$_SELECT);
 
-		tempNode.innerHTML = template.call(this, select);
-
-		return Array.prototype.slice.call(tempNode.children);
+		return  $(template.call(this, select));
 
 	};
 
