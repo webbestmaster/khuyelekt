@@ -4,7 +4,10 @@
 	'use strict';
 	/*global window */
 
+
 	win.addEventListener('load', function () {
+
+		FastClick.attach(document.body);
 
 /*
 		var node = win.document.querySelector('.me');
@@ -75,8 +78,6 @@
 		selectFree.bind(selectFree.KEYS.EVENTS.CHANGE, function () {
 			console.log(selectFree.KEYS.EVENTS.CHANGE);
 		});
-
-
 
 	}, false);
 
