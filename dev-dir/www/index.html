@@ -15,7 +15,10 @@
 	<link rel="stylesheet" href="css/khuyelekt.css">
 
 	<script src="js/lib/external/fastclick.js" type="text/javascript"></script>
+	<!--<script src="js/lib/external/es5-sham.js" type="text/javascript"></script>-->
+	<!--<script src="js/lib/external/es5-sham.js" type="text/javascript"></script>-->
 
+	<script src="js/lib/external/raf.js" type="text/javascript"></script>
 	<script src="js/lib/external/promise.js" type="text/javascript"></script>
 
 	<script src="js/lib/external/Tween.js" type="text/javascript"></script>
@@ -43,6 +46,33 @@
 	</div>
 
 </div>
+
+<script type="text/javascript">
+
+	/*jslint white: true, nomen: true */
+	(function (win) {
+
+		'use strict';
+		/*global window */
+		/*global */
+
+
+		var gOldOnError = window.onerror;
+
+		window.onerror = function (errorMsg, url, lineNumber) {
+
+			 alert(JSON.stringify(arguments));
+
+			if (gOldOnError) {
+				return gOldOnError(errorMsg, url, lineNumber);
+			}
+
+		};
+
+
+	}(window));
+
+</script>
 
 
 </body>

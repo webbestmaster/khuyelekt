@@ -571,13 +571,6 @@
 
 	};
 
-	if (typeof TWEEN !== undefined) {
-		(function animate(time) {
-			requestAnimationFrame(animate);
-			TWEEN.update(time);
-		}());
-	}
-
 	var _globals = (function () {
 		return this || (0, eval)('this');
 	}());

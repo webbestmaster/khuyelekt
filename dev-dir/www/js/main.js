@@ -4,8 +4,14 @@
 	'use strict';
 	/*global window */
 
+	function init() {
 
-	win.addEventListener('load', function () {
+		if (typeof TWEEN !== undefined) {
+			(function animate(time) {
+				requestAnimationFrame(animate);
+				TWEEN.update(time);
+			}());
+		}
 
 		FastClick.attach(document.body);
 
@@ -16,7 +22,7 @@
 		 console.log(NodeParser(node));
 		 */
 
-		var selectFree = new SelectFree(
+		var selectFree = new win.SelectFree(
 			$('select'),
 			{
 				events: {
@@ -61,6 +67,7 @@
 						'.option': {
 
 							onStart: function (data) {
+								this.style.backgroundColor = '#c00';
 								this.style.opacity = data.opacity;
 							},
 
@@ -68,9 +75,10 @@
 
 							to: { opacity: 1, width: 500 },
 
-							time: 1000,
-							
+							time: 10000,
+
 							onUpdate: function (data) {
+								this.style.width = data.width + 'px';
 								this.style.opacity = data.opacity;
 							},
 							onComplete: function (data, to) {
@@ -139,7 +147,8 @@
 		 }, 4000);
 		 */
 
+	}
 
-	}, false);
+	win.addEventListener('load', init, false);
 
 }(window));
