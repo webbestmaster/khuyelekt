@@ -6,10 +6,11 @@
 
 	function SelectFree($select, elementData, listData) {
 
-		var selectFree = this;
+		var selectFree = this,
+			listDataAnimations = listData.animations || {};
 
 		selectFree.attr = {};
-		
+
 		selectFree.events = {};
 
 		$select.css('display', 'none');
@@ -20,6 +21,10 @@
 		selectFree.set(selectFree.KEYS.ELEMENT.EVENTS, elementData.events || {});
 		selectFree.set(selectFree.KEYS.LIST.TEMPLATE, listData.template);
 		selectFree.set(selectFree.KEYS.LIST.EVENTS, listData.events || {});
+
+		selectFree.set(selectFree.KEYS.ANIMATIONS.LIST.OPENING, listDataAnimations.opening || {});
+		selectFree.set(selectFree.KEYS.ANIMATIONS.LIST.CLOSING, listDataAnimations.closing || {});
+
 		// selectFree.set(selectFree.KEYS.OPTIONS, options || {});
 		selectFree.setOpenState(selectFree.KEYS.STATES.CLOSE);
 
@@ -188,12 +193,10 @@
 			return selectFree.get(selectFree.KEYS.PROMISES.OPENING);
 		}
 
-		promise = new Promise(function (resolve, reject) {
-
-			// show list animation here
-			setTimeout(resolve, 1000);
-
-		}).then(function () {
+		promise = selectFree.createAnimations(
+			$list,
+			selectFree.get(selectFree.KEYS.ANIMATIONS.LIST.OPENING)
+		).then(function () {
 
 			selectFree.bindListEventListeners();
 			selectFree.setOpenState(selectFree.KEYS.STATES.OPEN);
@@ -227,11 +230,10 @@
 			return selectFree.get(selectFree.KEYS.PROMISES.CLOSING);
 		}
 
-		promise = new Promise(function (resolve, reject) {
-
-			setTimeout(resolve, 1000);
-
-		}).then(function () {
+		promise = selectFree.createAnimations(
+			$list,
+			selectFree.get(selectFree.KEYS.ANIMATIONS.LIST.CLOSING)
+		).then(function () {
 
 			$list.remove();
 
@@ -378,6 +380,13 @@
 			DESTROY: 'select-free:events:destroy'
 		},
 
+		ANIMATIONS: {
+			LIST: {
+				OPENING: 'select-free:animations:list:opening',
+				CLOSING: 'select-free:animations:list:closing'
+			}
+		},
+
 		ELEMENT: {
 			TEMPLATE: 'select-free:element:template',
 			EVENTS: 'select-free:element:events'
@@ -469,6 +478,98 @@
 
 	};
 
+	SelectFree.prototype.createAnimations = function ($nodes, animationsData) {
+
+		var selectFree = this,
+			key,
+			promises = [], i = 0;
+
+		for (key in animationsData) {
+			if (animationsData.hasOwnProperty(key)) {
+				promises[i] = selectFree.createAnimation($nodes, key, animationsData[key]);
+				i += 1;
+			}
+		}
+
+		return Promise.all(promises);
+
+	};
+
+	SelectFree.prototype.createAnimation = function ($nodes, selector, animationData) {
+
+		var $foundNodes = $nodes.find(selector),
+			from = JSON.parse(JSON.stringify(animationData.from || {})),
+			to = JSON.parse(JSON.stringify(animationData.to || {})),
+			onUpdate = animationData.onUpdate,
+			onComplete = animationData.onComplete,
+			onStart = animationData.onStart,
+			delay = animationData.delay,
+			time = animationData.time || 0,
+			easing = animationData.easing,
+			promises = [],
+			tweens = [],
+			node,
+			i, len;
+
+		for (i = 0, len = $foundNodes.length; i < len; i += 1) {
+
+			node = $foundNodes[i];
+
+			onStart.call(node, from);
+
+			promises[i] = new Promise(function (resolve, reject) {
+
+				var tween = new TWEEN.Tween(from);
+
+				tween.to(to, time);
+
+				if (onUpdate) {
+					tween.onUpdate(onUpdate.bind(node, from));
+				}
+
+				if (onComplete) {
+					tween.onComplete(function () {
+						onComplete.call(node, from, to);
+						resolve();
+					});
+				} else {
+					tween.onComplete(resolve);
+				}
+
+				if (delay) {
+					tween.delay(delay);
+				}
+
+				if (easing) {
+					tween.easing(easing);
+				}
+
+				tweens[i] = tween;
+
+				tween.start();
+
+			});
+
+		}
+
+		return Promise.all(promises).then(function () {
+
+			var i, len;
+
+			for (i = 0, len = tweens.length; i < len; i += 1) {
+				TWEEN.remove(tweens[i]);
+			}
+
+		});
+
+	};
+
+	if (typeof TWEEN !== undefined) {
+		(function animate(time) {
+			requestAnimationFrame(animate);
+			TWEEN.update(time);
+		}());
+	}
 
 	var _globals = (function () {
 		return this || (0, eval)('this');

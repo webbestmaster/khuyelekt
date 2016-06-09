@@ -9,12 +9,12 @@
 
 		FastClick.attach(document.body);
 
-/*
-		var node = win.document.querySelector('.me');
-		console.log(new NodeParser(node));
-		console.log(NodeParser.prototype.parseNode(node));
-		console.log(NodeParser(node));
-*/
+		/*
+		 var node = win.document.querySelector('.me');
+		 console.log(new NodeParser(node));
+		 console.log(NodeParser.prototype.parseNode(node));
+		 console.log(NodeParser(node));
+		 */
 
 		var selectFree = new SelectFree(
 			$('select'),
@@ -28,7 +28,7 @@
 				},
 				template: function elementTemplate($select) {
 
-					return '<div>' + $select.val() + '</div>';
+					return '<div>' + $select.val() + '<div>mememme</div></div>';
 
 				}
 			},
@@ -50,7 +50,62 @@
 
 					// WARNING data-value - this value will be use as major value
 
+
+
 					return '<h1><div>close</div><div data-value="3" class="option">option 3</div><div data-value="0" class="option">option 0</div>  <span>assa</span>pizdatyi list</h1><span>' + ee + '</span>';
+
+				},
+				animations: {
+
+					opening: {
+						'.option': {
+
+							onStart: function (data) {
+								this.style.opacity = data.opacity;
+							},
+
+							from: { opacity: 0, width: 50 },
+
+							to: { opacity: 1, width: 500 },
+
+							time: 1000,
+							
+							onUpdate: function (data) {
+								this.style.opacity = data.opacity;
+							},
+							onComplete: function (data, to) {
+								console.log(to);
+								console.log(this.style.opacity + ' end');
+							}
+							// delay: 100,
+							// easing: TWEEN.Easing.Elastic.InOut
+						}
+					},
+					closing: {
+						'.option': {
+
+							onStart: function (data) {
+								this.style.opacity = data.opacity;
+							},
+
+							from: { opacity: 1, width: 50 },
+
+							to: { opacity: 0, width: 500 },
+
+							time: 1000,
+
+							onUpdate: function (data) {
+								this.style.opacity = data.opacity;
+							},
+							onComplete: function (data, to) {
+								console.log(to);
+								console.log(this.style.opacity + ' end');
+							}
+							// delay: 100,
+							// easing: TWEEN.Easing.Elastic.InOut
+
+						}
+					}
 
 				}
 
@@ -77,9 +132,13 @@
 			console.log(selectFree.KEYS.EVENTS.DESTROY);
 		});
 
-		setTimeout(function () {
-			selectFree.destroy();
-		}, 4000);
+
+		/*
+		 setTimeout(function () {
+		 selectFree.destroy();
+		 }, 4000);
+		 */
+
 
 	}, false);
 

@@ -1,32 +1,17 @@
-Meet SelectFree!
+<h1>Meet SelectFree!</h1>
 
-The wrapper/replacer above usual tag select.
+<h2>The wrapper/replacer over usual tag select.</h2>
 
-Dependencies:
+<h3>Dependencies:</h3>
 
-1) jQuery or jBone(recommended) or like jQuery library
-2) Native Promise or promise-polyfill
-3) TweenMax - for animation
-4) Event Emitter (will be reduced in future)
+<ol>
+	<li>jQuery or jBone (recommended) or like jQuery library</li>
+	<li>TweenJS - for animation</li>
+	<li>Native Promise or promise-polyfill</li>
+</ol>
 
-
-Recommended:
-
-1) Use doT.js to create templates more comfortable
-
-<!--
-1) doT.js
-    https://github.com/olado/doT
-    https://raw.githubusercontent.com/olado/doT/master/doT.js
--->
+<h2>Recommended:</h2>
+<p>doT.js to create templates more comfortable.</p>
 
 
-
-
-
-
-
-
-
-
-
+<p>PS: jBone not work yet, but works in progress...</p>
