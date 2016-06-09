@@ -9,6 +9,8 @@
 		var selectFree = this;
 
 		selectFree.attr = {};
+		
+		selectFree.events = {};
 
 		$select.css('display', 'none');
 
@@ -31,7 +33,75 @@
 
 	}
 
-	MicroEvent.mixin(SelectFree);
+	SelectFree.prototype.bind = function (event, fn) {
+
+		var events = this.events,
+			arr;
+
+		if (!events[event]) {
+			events[event] = [];
+		}
+
+		arr = events[event];
+
+		arr[arr.length] = fn;
+
+	};
+
+	SelectFree.prototype.unbind = function (event, fn) {
+
+		var selectFree = this,
+			events = selectFree.events,
+			arr = events[event],
+			key;
+
+		// detect selectFree.unbind();
+		if (!event && !fn) {
+			for (key in events) {
+				if (events.hasOwnProperty(key)) {
+					events[key] = [];
+				}
+			}
+			return;
+		}
+
+		// detect selectFree.unbind(event);
+		if (!fn) {
+			events[event] = [];
+			return;
+		}
+
+		// detect not array for this event
+		if (!arr) {
+			return;
+		}
+
+		// detect selectFree.unbind(event, fn);
+		arr.splice(arr.indexOf(fn), 1);
+
+	};
+
+	SelectFree.prototype.trigger = function (event /* , args... */) {
+
+		var selectFree = this,
+			events = selectFree.events,
+			arr = events[event] || [],
+			i, len,
+			args = [];
+
+		for (i = 1, len = arguments.length; i < len; i += 1) {
+			args[i - 1] = arguments[i];
+		}
+
+		// WARNING
+		// in problem case
+		// replace this code for
+		// forEach
+		for (i = 0, len = arr.length; i < len; i += 1) {
+			arr[i].apply(selectFree, args);
+		}
+
+	};
 
 	SelectFree.prototype.defineDefaultPromises = function () {
 
@@ -392,6 +462,8 @@
 			$select.css('display', '');
 
 			selectFree.trigger(selectFree.KEYS.EVENTS.DESTROY);
+
+			selectFree.unbind();
 
 		});
 

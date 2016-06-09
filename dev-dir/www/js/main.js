@@ -77,6 +77,10 @@
 			console.log(selectFree.KEYS.EVENTS.DESTROY);
 		});
 
+		setTimeout(function () {
+			selectFree.destroy();
+		}, 4000);
+
 	}, false);
 
 }(window));
