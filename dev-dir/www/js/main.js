@@ -28,13 +28,7 @@
 				},
 				template: function elementTemplate($select) {
 
-					if ($select.val() === '1') {
-						return '<div>1</div>';
-					}
-
-					var ee = Math.random();
-
-					return '<span>444444</span> asdasdasdsfsaf <span>55555<span>ww</span></span><div>333</div><h1>ww</h1><span>' + ee + '</span>';
+					return '<div>' + $select.val() + '</div>';
 
 				}
 			},
@@ -56,7 +50,7 @@
 
 					// WARNING data-value - this value will be use as major value
 
-					return '<h1><div>close</div><div data-value="3" class="option">option</div>  <span>assa</span>pizdatyi list</h1><span>' + ee + '</span>';
+					return '<h1><div>close</div><div data-value="3" class="option">option 3</div><div data-value="0" class="option">option 0</div>  <span>assa</span>pizdatyi list</h1><span>' + ee + '</span>';
 
 				}
 

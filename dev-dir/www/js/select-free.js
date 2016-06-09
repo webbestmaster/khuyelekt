@@ -185,6 +185,7 @@
 		if (currentValue !== value) {
 			$select = selectFree.get(selectFree.KEYS.NODE.$_SELECT);
 			$select.val(value);
+			selectFree.updateElementNode();
 			selectFree.trigger(selectFree.KEYS.EVENTS.CHANGE, value);
 		}
 
