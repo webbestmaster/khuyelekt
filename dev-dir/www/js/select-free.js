@@ -10,8 +10,6 @@
 
 		selectFree.attr = {};
 
-		MicroEvent.mixin(this);
-
 		$select.css('display', 'none');
 
 		selectFree.set(selectFree.KEYS.NODE.$_BODY, $(doc.body));
@@ -32,6 +30,8 @@
 		selectFree.initialize();
 
 	}
+
+	MicroEvent.mixin(SelectFree);
 
 	SelectFree.prototype.defineDefaultPromises = function () {
 
@@ -303,8 +303,9 @@
 		},
 
 		EVENTS: {
-			SELECT: 'select-free:select',
-			CHANGE: 'select-free:change'
+			SELECT: 'select-free:events:select',
+			CHANGE: 'select-free:events:change',
+			DESTROY: 'select-free:events:destroy'
 		},
 
 		ELEMENT: {
@@ -389,6 +390,8 @@
 			selectFree.removeElementNode();
 
 			$select.css('display', '');
+
+			selectFree.trigger(selectFree.KEYS.EVENTS.DESTROY);
 
 		});
 

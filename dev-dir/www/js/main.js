@@ -73,6 +73,10 @@
 			console.log(selectFree.KEYS.EVENTS.CHANGE);
 		});
 
+		selectFree.bind(selectFree.KEYS.EVENTS.DESTROY, function () {
+			console.log(selectFree.KEYS.EVENTS.DESTROY);
+		});
+
 	}, false);
 
 }(window));
