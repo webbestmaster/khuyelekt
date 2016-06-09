@@ -4,15 +4,15 @@
 	"use strict";
 	/*global window */
 
-	function SelectFree($select, elementData, listData, options) {
-
-		// select.style.display = 'none';
+	function SelectFree($select, elementData, listData) {
 
 		var selectFree = this;
 
 		selectFree.attr = {};
 
 		MicroEvent.mixin(this);
+
+		$select.css('display', 'none');
 
 		selectFree.set(selectFree.KEYS.NODE.$_BODY, $(doc.body));
 		selectFree.set(selectFree.KEYS.NODE.$_SELECT, $select);
@@ -27,9 +27,26 @@
 
 		selectFree.onClickElement = selectFree.onClickElement.bind(selectFree);
 
+		selectFree.defineDefaultPromises();
+
 		selectFree.initialize();
 
 	}
+
+	SelectFree.prototype.defineDefaultPromises = function () {
+
+		var selectFree = this;
+
+		// define resolved Promises
+		selectFree.set(selectFree.KEYS.PROMISES.OPENING, new Promise(function (resolve, reject) {
+			resolve();
+		}));
+
+		selectFree.set(selectFree.KEYS.PROMISES.CLOSING, new Promise(function (resolve, reject) {
+			resolve();
+		}));
+
+	};
 
 	SelectFree.prototype.getOpenState = function () {
 
@@ -325,17 +342,25 @@
 
 	};
 
-	SelectFree.prototype.updateElementNode = function () {
+	SelectFree.prototype.removeElementNode = function () {
 
 		var selectFree = this,
-			$oldNodeElements = selectFree.get(selectFree.KEYS.NODE.$_ELEMENTS),
-			$select = selectFree.get(selectFree.KEYS.NODE.$_SELECT),
-			template = selectFree.get(selectFree.KEYS.ELEMENT.TEMPLATE),
-			$newNodeElements = selectFree.createNodes(template);
+			$oldNodeElements = selectFree.get(selectFree.KEYS.NODE.$_ELEMENTS);
 
 		if ($oldNodeElements) {
 			$oldNodeElements.off().remove();
 		}
+
+	};
+
+	SelectFree.prototype.updateElementNode = function () {
+
+		var selectFree = this,
+			$select = selectFree.get(selectFree.KEYS.NODE.$_SELECT),
+			template = selectFree.get(selectFree.KEYS.ELEMENT.TEMPLATE),
+			$newNodeElements = selectFree.createNodes(template);
+
+		selectFree.removeElementNode();
 
 		selectFree.set(selectFree.KEYS.NODE.$_ELEMENTS, $newNodeElements);
 
@@ -348,9 +373,24 @@
 	SelectFree.prototype.createNodes = function (template) {
 
 		var selectFree = this,
-			select = selectFree.get(selectFree.KEYS.NODE.$_SELECT);
+			$select = selectFree.get(selectFree.KEYS.NODE.$_SELECT);
 
-		return $(template.call(this, select));
+		return $(template.call(this, $select));
+
+	};
+
+	SelectFree.prototype.destroy = function () {
+
+		var selectFree = this,
+			$select = selectFree.get(selectFree.KEYS.NODE.$_SELECT);
+
+		selectFree.close().then(function () {
+
+			selectFree.removeElementNode();
+
+			$select.css('display', '');
+
+		});
 
 	};
 
