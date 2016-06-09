@@ -462,9 +462,16 @@
 	SelectFree.prototype.destroy = function () {
 
 		var selectFree = this,
+			currentOpenState = selectFree.getOpenState(),
 			$select = selectFree.get(selectFree.KEYS.NODE.$_SELECT);
 
-		selectFree.close().then(function () {
+		if (currentOpenState === selectFree.KEYS.STATES.OPENING) {
+			return selectFree.get(selectFree.KEYS.PROMISES.OPENING).then(function () {
+				return selectFree.destroy();
+			});
+		}
+
+		return selectFree.close().then(function () {
 
 			selectFree.removeElementNode();
 
