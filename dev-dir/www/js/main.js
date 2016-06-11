@@ -22,6 +22,10 @@
 		 console.log(NodeParser(node));
 		 */
 
+		$('select').on('change', function () {
+			console.log('native select was changed');
+		});
+
 		var selectFree = new win.SelectFree(
 			$('select'),
 			{
@@ -64,6 +68,25 @@
 				animations: {
 
 					opening: {
+						':scope': {
+
+							from: { bgOpacity: 0 },
+
+							to: { bgOpacity: 0.5 },
+
+							time: 500,
+
+							onUpdate: function (data) {
+								// this.style.width = data.width + 'px';
+								this.style.backgroundColor = 'rgba(255, 255, 255, ' + data.bgOpacity + ')';
+							},
+							onComplete: function (data, to) {
+								this.style.backgroundColor = 'rgba(255, 255, 255, ' + to.bgOpacity + ')';
+							}
+							// delay: 100,
+							// easing: TWEEN.Easing.Elastic.Out
+
+						},
 						'.option': {
 
 							onStart: function (data) {
@@ -75,7 +98,7 @@
 
 							to: { opacity: 1, width: 500 },
 
-							time: 10000,
+							time: 1000,
 
 							onUpdate: function (data) {
 								this.style.width = data.width + 'px';

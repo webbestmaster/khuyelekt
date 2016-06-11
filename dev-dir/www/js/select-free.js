@@ -2,7 +2,15 @@
 (function (win, doc) {
 
 	"use strict";
-	/*global window */
+	/*global window, requestAnimationFrame */
+	/*global TWEEN */
+
+	if (typeof TWEEN !== 'undefined') {
+		(function animate(time) {
+			requestAnimationFrame(animate);
+			TWEEN.update(time);
+		}());
+	}
 
 	function SelectFree($select, elementData, listData) {
 
@@ -275,6 +283,7 @@
 			$select = selectFree.get(selectFree.KEYS.NODE.$_SELECT);
 			$select.val(value);
 			selectFree.updateElementNode();
+			$select.trigger('change');
 			selectFree.trigger(selectFree.KEYS.EVENTS.CHANGE, value);
 		}
 
@@ -356,6 +365,10 @@
 
 		RE: {
 			SELECTOR_EVENT: /^(\S+)\s*([\s\S]*)$/
+		},
+
+		SELECTORS: {
+			SCOPE: ':scope'
 		},
 
 		OPEN_STATE: 'select-free:open-state',
@@ -504,7 +517,7 @@
 
 	SelectFree.prototype.createAnimation = function ($nodes, selector, animationData) {
 
-		var $foundNodes = $nodes.find(selector),
+		var $foundNodes = selector === this.KEYS.SELECTORS.SCOPE ? $nodes : $nodes.find(selector),
 			from = JSON.parse(JSON.stringify(animationData.from || {})),
 			to = JSON.parse(JSON.stringify(animationData.to || {})),
 			onUpdate = animationData.onUpdate,
@@ -522,7 +535,9 @@
 
 			node = $foundNodes[i];
 
-			onStart.call(node, from);
+			if (onStart) {
+				onStart.call(node, from);
+			}
 
 			promises[i] = new Promise(function (resolve, reject) {
 
